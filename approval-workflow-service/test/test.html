@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Approval Workflow Test Page</title>
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <style></style>
+    <script>
+      function showInteractiveTest() {
+        // get the history templates
+        var historyTemplate = $('#history-template').html();
+        var navTemplate = $('#history-nav').html();
+        var actionsTemplate = $('#actions-template').html();
+        $('#nav').empty().append(navTemplate);
+        $('#container').empty().append('<div id="history"></div><div id="actions"></div>');
+        var showHistory = function() {
+          // getHistory
+          $('#history').empty().append(historyTemplate);
+          $('#clear-history').unbind().click(function() {
+            $.getJSON("/api/clearHistory", function(history) {
+              showHistory();
+            });
+          })
+          $.getJSON("/api/getHistory", function(history) {
+            // display the history table
+            $('.history-table').DataTable({
+              data: history,
+              searching:false,
+              ordering: false,
+              paging:false,
+              info:false,
+              columns: [
+                {title:"User",data:"user",className:"dt-center","defaultContent": "<i>Not set</i>"},
+                {title:"Action",data:"action",className:"dt-center","defaultContent": "<i>Not set</i>"},
+                {title:"Milestone",data:"milestone",className:"dt-center","defaultContent": "<i>Not set</i>"},
+              ]
+            });
+          });
+          // getAllowedActions
+          $('#actions').empty().append(actionsTemplate);
+          $.getJSON("/api/getPermissions", function(permissions) {
+            // display actions
+            for (var user in permissions) {
+              if (permissions[user].view) {
+                permissions[user].actions.unshift("view");
+              }
+              var actionsHtml = permissions[user].actions.map(function(action) {
+                return '<a href="#" class="do-action" data-user="'+user+'">'+action+'</a>';
+              });
+              $('#'+user+'-actions').html(actionsHtml.join(','));
+            }
+            $('.do-action').click(function(e) {
+              var action = $(e.target).text();
+              var user = $(e.target).data('user');
+              // getAllowedActions
+              $.getJSON("/api/doAction",{"user":user,"action":action},function(result) {
+                if (result) {
+                  showHistory();
+                } else {
+                  alert('Cannot perform action!');
+                }
+              });
+            });
+          });
+        }
+        showHistory();
+      }
+      $(function() {
+        showInteractiveTest();
+      });
+    </script>
+    <script type="text/x-template" id="history-nav">
+      <h2>Interactive Workflow Test</h2>
+    </script>
+    <script type="text/x-template" id="history-template">
+      <h3>History</h3>
+      <div>
+        <a href="#" id="clear-history">clear history</a>
+      </div>
+      <table class="history-table cell-border" cellspacing="0" width="80%">
+        <thead>
+          <tr>
+            <th class="dt-center">User</th>
+            <th class="dt-center">Action</th>
+            <th class="dt-center">Milestone</th>
+          </tr>
+        </thead>
+      </table>
+    </script>
+    <script type="text/x-template" id="actions-template">
+      <h3>Allowed Actions</h3>
+      <table class="actions-table" cellspacing="0" border="1" align="center" width="80%">
+        <thead>
+          <tr>
+            <th>User 1 (Writer)</th>
+            <th>User 2 (Sub Editor)</th>
+            <th>User 3 (Editor)</th>
+            <th>User 4 (Writer)</th>
+            <th>User 5 (Sub Editor)</th>
+            <th>User 6 (Editor)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td align="center"><span id="user1-actions"></span></td>
+            <td align="center"><span id="user2-actions"></span></td>
+            <td align="center"><span id="user3-actions"></span></td>
+            <td align="center"><span id="user4-actions"></span></td>
+            <td align="center"><span id="user5-actions"></span></td>
+            <td align="center"><span id="user6-actions"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </script>
+</head>
+
+<body>
+  <div id="header">
+    <div id="nav"></div>
+  </div>
+  <div id="container"></div>
+</body>

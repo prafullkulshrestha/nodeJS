@@ -1,0 +1,204 @@
+{
+  "id": "approval",
+  "name":"Approval Workflow",
+  "description":"Workflow for approval of content created by writers and approved by subeditors and editors",
+  "defaultMilestone":"new",
+  "roles" : {
+    "writer": {
+      "id":"writer",
+      "name":"Writer",
+      "description":"A writer can create new content and submit it for review. A subeditor or editor can review the submitted content"
+    },
+    "subeditor": {
+      "id":"subeditor",
+      "name":"Sub Editor",
+      "description":"A Sub Editor can create new content as well as review content created by other writers. Content created or reviewed is then submitted for approval to an editor"
+    },
+    "editor": {
+      "id":"editor",
+      "name":"Editor",
+      "description":"An Editor can create new content as well as review or approve content created by other writers. Approved content can then be published."
+    }
+  },
+  "actions":{
+    "save":{
+      "id":"save",
+      "name":"Save Document",
+      "description":"Save a document",
+      "role":["writer","subeditor","editor"],
+      "milestone":"_lastmilestone"
+    },
+    "submit":{
+      "id":"submit",
+      "name":"Submit",
+      "description":"Submit a document for review by Sub Editor",
+      "role":"writer",
+      "milestone":"submitted"
+    },
+    "propose":{
+      "id":"propose",
+      "name":"Propose",
+      "description":"Propose the document for approval by Editor",
+      "role":["subeditor"],
+      "milestone":"proposed"
+    },
+    "return":{
+      "id":"return",
+      "name":"Return",
+      "description":"Return the document to the writer for modifications",
+      "role":["subeditor","editor"],
+      "milestone":"returned-to-writer"
+    },
+    "approve":{
+      "id":"approve",
+      "name":"Approve",
+      "description":"Approve the document for publishing",
+      "role":["editor"],
+      "milestone":"approved"
+    },
+    "reject":{
+      "id":"reject",
+      "name":"Reject",
+      "description":"Reject the document",
+      "role":["subeditor","editor"],
+      "milestone":"rejected"
+    },
+    "publish":{
+      "id":"publish",
+      "name":"Publish",
+      "description":"Publish the document to the live site",
+      "role":["editor"],
+      "milestone":"published"
+    },
+    "delete":{
+      "id":"delete",
+      "name":"Delete",
+      "description":"Delete the document",
+      "role":["_lastowner"],
+      "milestone":"deleted"
+    },
+    "restore":{
+      "id":"restore",
+      "name":"Restore",
+      "description":"Restore (undelete) the document to last milestone",
+      "role":["_lastowner"],
+      "milestone":"draft"
+    }
+  },
+  "milestones": {
+    "new": {
+      "id":"new",
+      "name":"New",
+      "description":"A document in draft mode can only be viewed or edited by the author of the document",
+      "role":["writer","subeditor","editor"],
+      "actions": ["submit","propose","approve",
+        {
+          "id":"save",
+          "milestone":"draft"
+        }
+      ]
+    },
+    "draft": {
+      "id":"draft",
+      "name":"Draft",
+      "description":"A document in draft mode can only be viewed or edited by the author of the document",
+      "role":["_lastowner"],
+      "actions": ["submit","delete","propose","approve",
+        {
+          "id":"save",
+          "role":"_lastowner"
+        }
+      ]
+    },
+    "submitted": {
+      "id":"submitted",
+      "name":"Submitted",
+      "description":"The document is submitted for review by a Sub Editor or Editor",
+      "role":["_owners","subeditor","editor"],
+      "actions": ["propose","return","reject","approve",
+        {
+          "id":"save",
+          "role":["subeditor","editor"]
+        }
+      ]
+    },
+    "proposed": {
+      "id":"proposed",
+      "name":"Proposed",
+      "description":"The document is proposed for approval by an Editor",
+      "role":["_owners","editor"],
+      "actions": ["approve",
+        {
+          "id":"save",
+          "role":"editor"
+        },
+        {
+          "id":"return",
+          "role":"editor",
+          "milestone":"returned-to-subeditor"
+        },
+        {
+          "id":"reject",
+          "role":"editor"
+        }
+      ]
+    },
+    "returned-to-writer": {
+      "id":"returned-to-writer",
+      "name":"Returned to Writer",
+      "description":"The document is returned to the writer for modifications",
+      "role":["_owners"],
+      "actions": ["submit",
+        {
+          "id":"save",
+          "role":"writer"
+        }
+      ]
+    },
+    "returned-to-subeditor": {
+      "id":"returned-to-subeditor",
+      "name":"Returned to Sub Editor",
+      "description":"The document is returned to the sub editor for modifications",
+      "role":["_owners"],
+      "actions": ["propose",
+        {
+          "id":"save",
+          "role":"subeditor"
+        },
+        {
+          "id":"return",
+          "role":[["subeditor"],["!_firstowner"]],
+          "milestone":"returned-to-writer"
+        }
+      ]
+    },
+    "approved": {
+      "id":"approved",
+      "name":"Approved",
+      "description":"The document is approved and is ready for publishing",
+      "role":["_owners","subeditor","editor"],
+      "actions": ["publish"]
+    },
+    "rejected": {
+      "id":"rejected",
+      "name":"Rejected",
+      "description":"The document is rejected and will not be published",
+      "role":["_owners","subeditor","editor"],
+      "actions": []
+    },
+    "published": {
+      "id":"published",
+      "name":"Published",
+      "description":"The document is published to the live site",
+      "role":["_owners","editor"],
+      "actions": []
+    },
+    "deleted": {
+      "id":"deleted",
+      "name":"Deleted",
+      "description":"The document has been deleted",
+      "role":["_owners"],
+      "actions": ["restore"]
+    }
+  }
+}

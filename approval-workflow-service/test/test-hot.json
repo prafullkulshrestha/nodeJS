@@ -1,0 +1,187 @@
+{
+    "id": "requirement",
+    "name":"requirement Workflow",
+    "description":"Workflow for managing requirement",
+    "defaultMilestone":"new",
+    "roles" : {
+        "AccountManager": {
+            "id":"AccountManager",
+            "name":"Account Manager",
+            "description":"An account Manager"
+        },
+        "TechnicalScreener": {
+            "id":"TechnicalScreener",
+            "name":"TechnicalScreener",
+            "description":"TechnicalScreener"
+        },
+        "Recruiter": {
+            "id":"Recruiter",
+            "name":"Recruiter",
+            "description":"Recruiter"
+        },
+        "Admin": {
+            "id":"Admin",
+            "name":"Admin",
+            "description":"Admin"
+        }
+    },
+    "actions":{
+        "save":{
+            "id":"save",
+            "name":"Save Requirement",
+            "description":"Save Requirement",
+            "role":["AccountManager","Admin"],
+            "milestone":"RequirementCreated"
+        },
+        "edit_save":{
+            "id":"edit_save",
+            "name":"Edit Requirement",
+            "description":"Edit Requirement",
+            "role":["AccountManager","Admin"],
+            "milestone":"_lastmilestone"
+        },
+        "addtechscreener":{
+            "id":"addtechscreener",
+            "name":"addtechscreener",
+            "description":"Add Technical Screener",
+            "role":["AccountManager","Admin"],
+            "milestone":"TechScreenerAdded"
+        },
+        "addrecruiter":{
+            "id":"addrecruiter",
+            "name":"addrecruiter",
+            "description":"Adds a Recruiter",
+            "role":["AccountManager","Admin"],
+            "milestone":"RecruiterAdded"
+        },
+        "addquestions":{
+            "id":"addquestions",
+            "name":"addquestions",
+            "description":"Add relevent questions based on skill",
+            "role":["TechnicalScreener"],
+            "milestone":"QuestionsAdded"
+        },
+        "submitquestions":{
+            "id":"submitquestions",
+            "name":"submitquestions",
+            "description":"Submit questions for approval",
+            "role":["TechnicalScreener"],
+            "milestone":"QuestionsSubmitted"
+        },
+        "approvequestions":{
+            "id":"approvequestions",
+            "name":"approvequestions",
+            "description":"Approve the questions for interview",
+            "role":["AccountManager","Admin"],
+            "milestone":"QuestionsApproved"
+        },
+        "rejectquestions":{
+            "id":"rejectquestions",
+            "name":"rejectquestions",
+            "description":"Reject the Questions",
+            "role":["AccountManager","Admin"],
+            "milestone":"QuestionsRejected"
+        },
+        "resubmitquestion":{
+            "id":"resubmitquestion",
+            "name":"resubmitquestion",
+            "description":"Questions Resubmitted",
+            "role":["TechnicalScreener"],
+            "milestone":"QuestionsResubmitted"
+        },
+        "addcandidates":{
+            "id":"addcandidates",
+            "name":"addcandidates",
+            "description":"Add a Candidate",
+            "role":["Recruiter"],
+            "milestone":"CandidateAdded"
+        },
+        "closerequirement":{
+            "id":"closerequirement",
+            "name":"closerequirement",
+            "description":"close the requirement",
+            "role":["AccountManager","Admin"],
+            "milestone":"RequirementClosed"
+        }
+    },
+    "milestones": {
+        "new": {
+            "id":"new",
+            "name":"New",
+            "description":"Add a New Requirement",
+            "role":["AccountManager"],
+            "actions": ["save"]
+        },
+        "RequirementCreated": {
+            "id":"RequirementCreated",
+            "name":"RequirementCreated",
+            "description":"Requirement Created",
+            "role":["_lastowner","AccountManager","Admin"],
+            "actions": ["addtechscreener","edit_save"]
+        },
+        "RecruiterAdded": {
+            "id":"RequirementCreated",
+            "name":"RequirementCreated",
+            "description":"Requirement Created",
+            "role":["Recruiter"],
+            "actions": ["addcandidates"]
+        },
+        "TechScreenerAdded": {
+            "id":"TechScreenerAdded",
+            "name":"TechScreenerAdded",
+            "description":"Technical Screener Added",
+            "role":["TechnicalScreener"],
+            "actions": ["addquestions"]
+        },
+        "QuestionsAdded": {
+            "id":"QuestionsAdded",
+            "name":"QuestionsAdded",
+            "description":"QuestionsAdded",
+            "role":["TechnicalScreener"],
+            "actions": ["submitquestions"]
+        },
+        "QuestionsSubmitted": {
+            "id":"QuestionsSubmitted",
+            "name":"QuestionsSubmitted",
+            "description":"The document is proposed for approval by an Editor",
+            "role":["AccountManager"],
+            "actions": ["approvequestions","rejectquestions"]
+        },
+        "QuestionsRejected": {
+            "id":"QuestionsRejected",
+            "name":"QuestionsRejected to Writer",
+            "description":"The document is returned to the writer for modifications",
+            "role":["TechnicalScreener"],
+            "actions": ["resubmitquestion"]
+        },
+        "QuestionsResubmitted": {
+            "id":"QuestionsResubmitted",
+            "name":"QuestionsResubmitted",
+            "description":"The document is proposed for approval by an Editor",
+            "role":["AccountManager"],
+            "actions": ["approvequestions","rejectquestions"]
+        },
+        "QuestionsApproved": {
+            "id":"QuestionsApproved",
+            "name":"QuestionsApproved",
+            "description":"The document is approved and is ready for publishing",
+            "role":["AccountManager","Admin"],
+            "actions": ["addrecruiter"]
+        },
+        "CandidateAdded": {
+            "id":"CandidateAdded",
+            "name":"CandidateAdded",
+            "description":"The document is rejected and will not be published",
+            "role":["AccountManager"],
+            "actions": ["closerequirement"]
+        },
+        "RequirementClosed": {
+            "id":"RequirementClosed",
+            "name":"RequirementClosed",
+            "description":"The document is rejected and will not be published",
+            "role":["AccountManager"],
+            "actions": []
+        }
+    }
+}
+
